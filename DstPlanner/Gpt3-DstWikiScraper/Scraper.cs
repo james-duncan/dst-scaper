@@ -49,9 +49,39 @@ namespace DstPlanner.WikiScraper.Gpt3
                 throw new InvalidOperationException("Code element not found on the page.");
             }
 
-            // Additional logic to extract other properties like Ingredients and Prerequisite
+            // Find the <div> element with attribute "data-source"="ingredient1"
+            var ingredientsElement = document.QuerySelector($"div[data-source='ingredient1']");
+            if (ingredientsElement != null)
+            {
+                gameItem.Ingredients = ExtractIngredients(ingredientsElement);
+            }
+
+            // Additional logic to extract other properties like Prerequisite
 
             return gameItem;
+        }
+
+        private Dictionary<string, int> ExtractIngredients(IElement ingredientsElement)
+        {
+            var ingredients = new Dictionary<string, int>();
+
+            // Find all <a> elements within the <div> element
+            var ingredientLinks = ingredientsElement.QuerySelectorAll("div.pi-data-value a");
+
+            foreach (var ingredientLink in ingredientLinks)
+            {
+                // Get the URL from the href attribute
+                var ingredientUrl = ingredientLink.GetAttribute("href");
+
+                // Get the quantity from the text content (e.g., "×3")
+                var quantityText = ingredientLink.NextElementSibling?.TextContent;
+                if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText.Trim('×'), out var quantity))
+                {
+                    ingredients.Add(ingredientUrl, quantity);
+                }
+            }
+
+            return ingredients;
         }
     }
 }

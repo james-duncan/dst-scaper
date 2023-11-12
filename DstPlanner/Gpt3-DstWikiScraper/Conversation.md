@@ -275,3 +275,138 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >}
 >```
 >This modification adds a section to find the div element with the attribute "data-source"="spawnCode" and then extracts the text content from the code element within it to populate the GameItemId property of the GameItem class. Adjust the code as needed based on the actual structure of the HTML you are working with.
+>
+### Dev
+>
+>Can you enhance the ParseGameItem method to find this HTML
+>```html
+><div class="pi-item pi-data pi-item-spacing pi-border-color" data-source="ingredient1">
+>		<h3 class="pi-data-label pi-secondary-font"><a href="/wiki/Crafting" title="Crafting">Crafting</a></h3>
+>	<div class="pi-data-value pi-font"><a href="/wiki/Cut_Stone" title="Cut Stone"><img alt="Cut Stone.png" src="/images/thumb/e/ef/Cut_Stone.png/24px-Cut_Stone.png" decoding="async" loading="lazy" width="24" height="24"></a>×3 <a href="/wiki/Charcoal" title="Charcoal"><img alt="Charcoal.png" src="/images/thumb/4/4f/Charcoal.png/24px-Charcoal.png" decoding="async" loading="lazy" width="24" height="24"></a>×6 <a href="/wiki/Twigs" title="Twigs"><img alt="Twigs.png" src="/images/thumb/7/76/Twigs.png/24px-Twigs.png" decoding="async" loading="lazy" width="24" height="24"></a>×6</div>
+></div>
+>```
+>
+>This block contains an <a> tag for each ingredient, followed by a multiplier (eg. x1)
+>
+>Store each ingredient into the GameItem.Ingredients dictionary with the key being the URL in the <a> element and the Value being the integer in the multiplier
+### ChatGPT
+>
+>Certainly! To extract the ingredients and their quantities from the provided HTML block and store them in the Ingredients dictionary of the GameItem class, you can enhance the ParseGameItem method as follows:
+>
+>```csharp
+>
+>using System;
+>using System.Collections.Generic;
+>using System.Linq;
+>using AngleSharp;
+>using AngleSharp.Dom;
+>
+>namespace DstPlanner.WikiScraper.Gpt3
+>{
+>    public class Scraper
+>    {
+>        public GameItem ParseGameItem(string pageUrl)
+>        {
+>            var config = Configuration.Default.WithDefaultLoader();
+>            var context = BrowsingContext.New(config);
+>            var document = context.OpenAsync(pageUrl).GetAwaiter().GetResult();
+>
+>            var gameItem = new GameItem();
+>
+>            // Find the <h2> element with attribute "data-source"="box title"
+>            var nameElement = document.QuerySelector($"h2[data-source='Box title']");
+>            if (nameElement != null)
+>            {
+>                gameItem.Name = nameElement.TextContent.Trim();
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Name element not found on the page.");
+>            }
+>
+>            // Find the <img> element within the <figure> element with class "pi-image"
+>            var imgElement = document.QuerySelector("figure.pi-image img");
+>            if (imgElement != null)
+>            {
+>                gameItem.ImgUrl = imgElement.GetAttribute("src");
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Image element not found on the page.");
+>            }
+>
+>            // Find the <div> element with attribute "data-source"="spawnCode"
+>            var codeElement = document.QuerySelector($"div[data-source='spawnCode'] code");
+>            if (codeElement != null)
+>            {
+>                gameItem.GameItemId = codeElement.TextContent.Trim('"');
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Code element not found on the page.");
+>            }
+>
+>            // Find the <div> element with attribute "data-source"="ingredient1"
+>            var ingredientsElement = document.QuerySelector($"div[data-source='ingredient1']");
+>            if (ingredientsElement != null)
+>            {
+>                gameItem.Ingredients = ExtractIngredients(ingredientsElement);
+>            }
+>
+>            // Additional logic to extract other properties like Prerequisite
+>
+>            return gameItem;
+>        }
+>
+>        private Dictionary<string, int> ExtractIngredients(IElement ingredientsElement)
+>        {
+>            var ingredients = new Dictionary<string, int>();
+>
+>            // Find all <a> elements within the <div> element
+>            var ingredientLinks = ingredientsElement.QuerySelectorAll("div.pi-data-value a");
+>
+>            foreach (var ingredientLink in ingredientLinks)
+>            {
+>                // Get the URL from the href attribute
+>                var ingredientUrl = ingredientLink.GetAttribute("href");
+>
+>                // Get the quantity from the text content (e.g., "×3")
+>                var quantityText = ingredientLink.NextElementSibling?.TextContent;
+>                if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText.Trim('×'), out var quantity))
+>                {
+>                    ingredients.Add(ingredientUrl, quantity);
+>                }
+>            }
+>
+>            return ingredients;
+>        }
+>    }
+>}
+>```
+>This modification adds a new private method ExtractIngredients to handle the extraction of ingredients. The method uses QuerySelectorAll to find all <a> elements within the <div> element and then iterates over them, extracting the URL and quantity information. The extracted information is then stored in the Ingredients dictionary of the GameItem class. Adjust the code as needed based on the actual structure of the HTML you are working with.
+
+### Dev
+
+>There is a bug in the above code
+
+###ChatGPT
+
+>Error in Moderation
+
+
+# Message from the developer
+
+At this point, chat GPT made a mistake (first time actually).
+
+```csharp
+var quantityText = ingredientLink.NextElementSibling?.TextContent;
+```
+Find the next ELEMENT sibling. But the multiplier is just text content (which isn't great practice in HTML as far as I'm concerned. But it is functional HTML)
+
+GPT should have used `NextSibling`.
+
+I told GPT of its mistake, and received an 'Error in moderation' response. After a couple tries, I still get the response. Maybe this backlog of code is becoming too complex?
+
+# Conversation continues
+
+
