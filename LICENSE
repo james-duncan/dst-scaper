@@ -19,3 +19,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+=== DstPlanner\Gpt3-DstWikiScraper
+
+Code in the DstPlanner\Gpt3-DstWikiScraper sub directory is designed to work with content in the wiki at: https://dontstarve.wiki.gg
+This wiki is published under https://creativecommons.org/licenses/by-sa/4.0/#
+Any use of the tool should comply with their licence. This project has no afficiation with https://dontstarve.wiki.gg
