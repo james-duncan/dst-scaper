@@ -165,3 +165,113 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >```
 >
 >This modification uses the QuerySelector method to find the img element within the figure element with class "pi-image" and extracts the src attribute to get the image URL. Again, make sure to handle cases where the elements may not be present or have a different structure in the actual HTML. Adjust the logic accordingly based on the structure of the wiki pages you are working with.
+
+### Dev
+>I've updated the GameItem class 
+>
+>```
+>namespace DstPlanner.WikiScraper.Gpt3;
+>
+>public record GameItem
+>{
+>    /// <summary>
+>    /// The game item identifier.
+>    /// </summary>
+>    public string GameItemId { get; set; }
+>
+>    /// <summary>
+>    /// The name of the GameItem.
+>    /// </summary>
+>    public string Name { get; set; }
+>
+>    /// <summary>
+>    /// Link to the image of the game item.
+>    /// </summary>
+>    public string ImgUrl { get; set; }
+>
+>    /// <summary>
+>    /// List of game items required to craft this game item.
+>    /// </summary>
+>    public Dictionary<string, int>? Ingredients { get; set; }
+>
+>    /// <summary>
+>    /// Required tools to craft this game item.
+>    /// </summary>
+>    public GameItem? Prerequisite { get; set; }
+>}
+>```
+>
+>In the same HTML as earlier, this sub-element shows contains a code
+>```
+><div class="pi-item pi-data pi-item-spacing pi-border-color" data-source="spawnCode">
+>		<h3 class="pi-data-label pi-secondary-font"><a href="/wiki/Console" title="Console">Code</a></h3>
+>	<div class="pi-data-value pi-font"><code>"cookpot"</code></div>
+></div>
+>```
+>Find this element using the data-source, then parse the code (in this example: "cookpot") from the pi-data-value element. Store the code into the GameItemId property of GameItem
+
+### ChatGPT
+>
+>Certainly! You can modify the ParseGameItem method to include logic for extracting the GameItemId property from the provided HTML. Here's the updated code:
+>
+>```csharp
+>
+>using System;
+>using System.Collections.Generic;
+>using System.Linq;
+>using AngleSharp;
+>using AngleSharp.Dom;
+>
+>namespace DstPlanner.WikiScraper.Gpt3
+>{
+>    public class Scraper
+>    {
+>        public GameItem ParseGameItem(string pageUrl)
+>        {
+>            var config = Configuration.Default.WithDefaultLoader();
+>            var context = BrowsingContext.New(config);
+>            var document = context.OpenAsync(pageUrl).GetAwaiter().GetResult();
+>
+>            var gameItem = new GameItem();
+>
+>            // Find the <h2> element with attribute "data-source"="box title"
+>            var nameElement = document.QuerySelector($"h2[data-source='Box title']");
+>            if (nameElement != null)
+>            {
+>                gameItem.Name = nameElement.TextContent.Trim();
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Name element not found on the page.");
+>            }
+>
+>            // Find the <img> element within the <figure> element with class "pi-image"
+>            var imgElement = document.QuerySelector("figure.pi-image img");
+>            if (imgElement != null)
+>            {
+>                gameItem.ImgUrl = imgElement.GetAttribute("src");
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Image element not found on the page.");
+>            }
+>
+>            // Find the <div> element with attribute "data-source"="spawnCode"
+>            var codeElement = document.QuerySelector($"div[data-source='spawnCode'] code");
+>            if (codeElement != null)
+>            {
+>                gameItem.GameItemId = codeElement.TextContent.Trim('"');
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Code element not found on the page.");
+>            }
+>
+>            // Additional logic to extract other properties like Ingredients and Prerequisite
+>
+>            return gameItem;
+>        }
+>    }
+>}
+>```
+>This modification adds a section to find the div element with the attribute "data-source"="spawnCode" and then extracts the text content from the code element within it to populate the GameItemId property of the GameItem class. Adjust the code as needed based on the actual structure of the HTML you are working with.

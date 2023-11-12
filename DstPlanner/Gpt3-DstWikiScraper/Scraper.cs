@@ -38,6 +38,17 @@ namespace DstPlanner.WikiScraper.Gpt3
                 throw new InvalidOperationException("Image element not found on the page.");
             }
 
+            // Find the <div> element with attribute "data-source"="spawnCode"
+            var codeElement = document.QuerySelector($"div[data-source='spawnCode'] code");
+            if (codeElement != null)
+            {
+                gameItem.GameItemId = codeElement.TextContent.Trim('"');
+            }
+            else
+            {
+                throw new InvalidOperationException("Code element not found on the page.");
+            }
+
             // Additional logic to extract other properties like Ingredients and Prerequisite
 
             return gameItem;
