@@ -24,11 +24,21 @@ namespace DstPlanner.WikiScraper.Gpt3
             }
             else
             {
-                // Handle the case when the element is not found
                 throw new InvalidOperationException("Name element not found on the page.");
             }
 
-            // Additional logic to extract other properties like ImgUrl, Ingredients, and Prerequisite
+            // Find the <img> element within the <figure> element with class "pi-image"
+            var imgElement = document.QuerySelector("figure.pi-image img");
+            if (imgElement != null)
+            {
+                gameItem.ImgUrl = imgElement.GetAttribute("src");
+            }
+            else
+            {
+                throw new InvalidOperationException("Image element not found on the page.");
+            }
+
+            // Additional logic to extract other properties like Ingredients and Prerequisite
 
             return gameItem;
         }

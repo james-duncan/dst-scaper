@@ -103,5 +103,65 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >```
 >This example extracts the Name property from the provided HTML. You can extend this method to include logic for extracting other properties such as ImgUrl, Ingredients, and Prerequisite based on the structure of the HTML.
 >
->Remember to handle the possible cases where the required elements might not be present on the page or have a different structure. This example provides a basic starting point, and you can build upon it based on the specific structure of the wiki pages you are working with.
-ChatGPT can make mistakes. Consider checking important information.
+
+### Dev
+>Inside the same HTML block, you enhance ParseGameItem to get the GameItem.ImgUrl from the hyperlink in this sub-element
+>```
+><img src="/images/thumb/a/ad/Crock_Pot_Build.png/300px-Crock_Pot_Build.png" srcset="/images/thumb/a/ad/Crock_Pot_Build.png/300px-Crock_Pot_Build.png 1x, /images/a/ad/Crock_Pot_Build.png 2x" class="pi-image-thumbnail" alt="Crock Pot" width="270" height="287">
+>```
+
+### ChatGPT
+
+>Certainly! To extract the ImgUrl property from the provided HTML, you can enhance the ParseGameItem method as follows:
+>
+>```csharp
+>
+>using System;
+>using System.Collections.Generic;
+>using System.Linq;
+>using AngleSharp;
+>using AngleSharp.Dom;
+>
+>namespace DstPlanner.WikiScraper.Gpt3
+>{
+>    public class Scraper
+>    {
+>        public GameItem ParseGameItem(string pageUrl)
+>        {
+>            var config = Configuration.Default.WithDefaultLoader();
+>            var context = BrowsingContext.New(config);
+>            var document = context.OpenAsync(pageUrl).GetAwaiter().GetResult();
+>
+>            var gameItem = new GameItem();
+>
+>            // Find the <h2> element with attribute "data-source"="box title"
+>            var nameElement = document.QuerySelector($"h2[data-source='Box title']");
+>            if (nameElement != null)
+>            {
+>                gameItem.Name = nameElement.TextContent.Trim();
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Name element not found on the page.");
+>            }
+>
+>            // Find the <img> element within the <figure> element with class "pi-image"
+>            var imgElement = document.QuerySelector("figure.pi-image img");
+>            if (imgElement != null)
+>            {
+>                gameItem.ImgUrl = imgElement.GetAttribute("src");
+>            }
+>            else
+>            {
+>                throw new InvalidOperationException("Image element not found on the page.");
+>            }
+>
+>            // Additional logic to extract other properties like Ingredients and Prerequisite
+>
+>            return gameItem;
+>        }
+>    }
+>}
+>```
+>
+>This modification uses the QuerySelector method to find the img element within the figure element with class "pi-image" and extracts the src attribute to get the image URL. Again, make sure to handle cases where the elements may not be present or have a different structure in the actual HTML. Adjust the logic accordingly based on the structure of the wiki pages you are working with.
