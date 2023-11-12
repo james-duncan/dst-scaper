@@ -3,6 +3,11 @@
 public record GameItem
 {
     /// <summary>
+    /// The game item identifier.
+    /// </summary>
+    public string GameItemId { get; set; }
+
+    /// <summary>
     /// The name of the GameItem.
     /// </summary>
     public string Name { get; set; }
@@ -15,7 +20,7 @@ public record GameItem
     /// <summary>
     /// List of game items required to craft this game item.
     /// </summary>
-    public List<GameItem>? Ingredients { get; set; }
+    public Dictionary<string, int>? Ingredients { get; set; }
 
     /// <summary>
     /// Required tools to craft this game item.
