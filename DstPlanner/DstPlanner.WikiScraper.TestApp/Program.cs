@@ -15,7 +15,7 @@ Console.WriteLine($"\tImage: {crockPot.ImgUrl ?? "None"}");
 
 if (crockPot.Ingredients != null)
 {
-    Console.WriteLine($"\tIngredients: {crockPot.ImgUrl}");
+    Console.WriteLine($"\tIngredients:");
     foreach (var ingredient in crockPot.Ingredients)
     {
         Console.WriteLine($"\t\t{ingredient.Key} x{ingredient.Value}");
