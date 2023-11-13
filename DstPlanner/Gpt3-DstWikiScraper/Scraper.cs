@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AngleSharp;
 using AngleSharp.Dom;
 
@@ -74,8 +75,11 @@ namespace DstPlanner.WikiScraper.Gpt3
                 var ingredientUrl = ingredientLink.GetAttribute("href");
 
                 // Get the quantity from the text content (e.g., "×3")
-                var quantityText = ingredientLink.NextElementSibling?.TextContent;
-                if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText.Trim('×'), out var quantity))
+                var quantityText = ingredientLink.TextContent;
+
+                // Extract the quantity from the text (assuming it's always in the format "×{number}")
+                var quantityMatch = Regex.Match(quantityText, @"×(\d+)");
+                if (quantityMatch.Success && int.TryParse(quantityMatch.Groups[1].Value, out var quantity))
                 {
                     ingredients.Add(ingredientUrl, quantity);
                 }
@@ -83,5 +87,6 @@ namespace DstPlanner.WikiScraper.Gpt3
 
             return ingredients;
         }
+
     }
 }
