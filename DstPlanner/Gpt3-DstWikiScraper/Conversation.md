@@ -693,10 +693,9 @@ private Dictionary<string, int> ExtractIngredients(IElement containerElement)
 }
 ```
 >
-### Dev
->
 >This modification assumes that containerElement is the parent element that contains the "pi-data-value" div. If it's the entire document, you can modify accordingly. Try using this version and see if it works for your specific HTML structure.
 >
+### Dev
 >The result has the quantities, but not the URLs of the ingredients
 >
 ### ChatGPT
@@ -782,11 +781,11 @@ private Dictionary<string, int> ExtractIngredients(IElement containerElement)
 >
 ### Dev
 >
->You've made a mistake. The quantity is text, not in an element, immediately following the <a>
+>You've made a mistake. The quantity is text, not in an element, immediately following the `<a>`
 >
 ### ChatGPT
 >
->I appreciate your clarification. If the quantity is directly in the text following the <a> element, you can modify the code accordingly. Here's an updated version:
+>I appreciate your clarification. If the quantity is directly in the text following the `<a>` element, you can modify the code accordingly. Here's an updated version:
 >
 >```csharp
 >
@@ -821,4 +820,4 @@ private Dictionary<string, int> ExtractIngredients(IElement containerElement)
 >}
 >```
 >
->This modification uses NextSibling to get the text content immediately following the <a> element. If this still doesn't work as expected, please provide a snippet of the HTML around the "pi-data-value" div for further assistance.
+>This modification uses NextSibling to get the text content immediately following the `<a>` element. If this still doesn't work as expected, please provide a snippet of the HTML around the "pi-data-value" div for further assistance.
