@@ -645,4 +645,51 @@ eg.
 >}
 >```
 >
->This version directly extracts the text content of the <div> element and splits it into tokens using space as a delimiter. It then processes every other token, treating it as the ingredient name and the following token as the quantity (assuming it starts with "×"). Please try this modification and see if it resolves the issue.
+>This version directly extracts the text content of the `<div>` element and splits it into tokens using space as a delimiter. It then processes every other token, treating it as the ingredient name and the following token as the quantity (assuming it starts with "×"). Please try this modification and see if it resolves the issue.
+
+### Dev
+
+Can you change either method to handle selecting the 'pi-data-value' div
+
+### ChatGPT
+
+Certainly! If the ingredient information is within a <div> element with the class "pi-data-value," you can modify the ExtractIngredients method to directly select that div. Here's an updated version:
+
+```csharp
+
+private Dictionary<string, int> ExtractIngredients(IElement containerElement)
+{
+    var ingredients = new Dictionary<string, int>();
+
+    // Find the <div> element with class "pi-data-value" within the container element
+    var ingredientsDivElement = containerElement.QuerySelector("div.pi-data-value");
+
+    if (ingredientsDivElement != null)
+    {
+        // Get the text content of the <div> element
+        var ingredientsText = ingredientsDivElement.TextContent;
+
+        // Split the text by space to separate individual ingredients
+        var ingredientTokens = ingredientsText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        for (int i = 0; i < ingredientTokens.Length; i += 2)
+        {
+            // Extract the ingredient name from the token (remove leading/trailing whitespace)
+            var ingredientName = ingredientTokens[i].Trim();
+
+            // Extract the quantity from the next token, skipping "×" and parsing as integer
+            if (i + 1 < ingredientTokens.Length && ingredientTokens[i + 1].StartsWith("×"))
+            {
+                var quantityText = ingredientTokens[i + 1].Substring(1);
+                if (int.TryParse(quantityText, out var quantity))
+                {
+                    ingredients.Add(ingredientName, quantity);
+                }
+            }
+        }
+    }
+
+    return ingredients;
+}
+```
+This modification assumes that containerElement is the parent element that contains the "pi-data-value" div. If it's the entire document, you can modify accordingly. Try using this version and see if it works for your specific HTML structure.
