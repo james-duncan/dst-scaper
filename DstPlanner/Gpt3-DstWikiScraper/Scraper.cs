@@ -71,32 +71,25 @@ namespace DstPlanner.WikiScraper.Gpt3
 
             if (ingredientsDivElement != null)
             {
-                // Get the text content of the <div> element
-                var ingredientsText = ingredientsDivElement.TextContent;
+                // Find all <a> elements within the <div> element
+                var ingredientLinks = ingredientsDivElement.QuerySelectorAll("a");
 
-                // Split the text by space to separate individual ingredients
-                var ingredientTokens = ingredientsText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 0; i < ingredientTokens.Length; i += 2)
+                foreach (var ingredientLink in ingredientLinks)
                 {
-                    // Extract the ingredient name from the token (remove leading/trailing whitespace)
-                    var ingredientName = ingredientTokens[i].Trim();
+                    // Get the URL from the href attribute
+                    var ingredientUrl = ingredientLink.GetAttribute("href");
 
-                    // Extract the quantity from the next token, skipping "×" and parsing as integer
-                    if (i + 1 < ingredientTokens.Length && ingredientTokens[i + 1].StartsWith("×"))
+                    // Get the quantity from the text content (e.g., "×3")
+                    var quantityText = ingredientLink.NextElementSibling?.TextContent;
+                    if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText.Trim('×'), out var quantity))
                     {
-                        var quantityText = ingredientTokens[i + 1].Substring(1);
-                        if (int.TryParse(quantityText, out var quantity))
-                        {
-                            ingredients.Add(ingredientName, quantity);
-                        }
+                        ingredients.Add(ingredientUrl, quantity);
                     }
                 }
             }
 
             return ingredients;
         }
-
 
     }
 }

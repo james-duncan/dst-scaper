@@ -692,4 +692,47 @@ private Dictionary<string, int> ExtractIngredients(IElement containerElement)
     return ingredients;
 }
 ```
-This modification assumes that containerElement is the parent element that contains the "pi-data-value" div. If it's the entire document, you can modify accordingly. Try using this version and see if it works for your specific HTML structure.
+>
+### Dev
+>
+>This modification assumes that containerElement is the parent element that contains the "pi-data-value" div. If it's the entire document, you can modify accordingly. Try using this version and see if it works for your specific HTML structure.
+>
+>The result has the quantities, but not the URLs of the ingredients
+>
+### ChatGPT
+>
+>I see, it seems the URLs are missing from the result. If the URLs are in the same structure within the <div class="pi-data-value"> element, we need to adjust the code to extract them as well. Here's an updated version of the ExtractIngredients method:
+>
+>```csharp
+>
+>private Dictionary<string, int> ExtractIngredients(IElement containerElement)
+>{
+>    var ingredients = new Dictionary<string, int>();
+>
+>    // Find the <div> element with class "pi-data-value" within the container element
+>    var ingredientsDivElement = containerElement.QuerySelector("div.pi-data-value");
+>
+>    if (ingredientsDivElement != null)
+>    {
+>        // Find all <a> elements within the <div> element
+>        var ingredientLinks = ingredientsDivElement.QuerySelectorAll("a");
+>
+>        foreach (var ingredientLink in ingredientLinks)
+>        {
+>            // Get the URL from the href attribute
+>            var ingredientUrl = ingredientLink.GetAttribute("href");
+>
+>            // Get the quantity from the text content (e.g., "×3")
+>            var quantityText = ingredientLink.NextElementSibling?.TextContent;
+>            if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText.Trim('×'), out var quantity))
+>            {
+>                ingredients.Add(ingredientUrl, quantity);
+>            }
+>        }
+>    }
+>
+>    return ingredients;
+>}
+>```
+>
+>This version includes a loop to iterate over all <a> elements within the "pi-data-value" div, extracting both the URL and the quantity. Make sure the structure of your HTML matches this assumption. Try using this updated version and see if it resolves the issue.
