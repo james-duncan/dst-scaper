@@ -7,10 +7,10 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 ### Gpt3
 > Good afternoon! How can I assist you today?
 
-### User
+### Dev
 >I want to create a .net 7 class library to parse information from a wiki website. The library used will be Anglesharp.
 >To begin, the output of the parser will be this class:
->```
+>```csharp
 >namespace DstPlanner.WikiScraper.Gpt3;
 >
 >public record GameItem
@@ -37,7 +37,7 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >}
 >```
 >The parse will be inside this method
->```
+>```csharp
 >namespace DstPlanner.WikiScraper.Gpt3;
 >
 >public class Scraper
@@ -52,14 +52,13 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >
 >
 >The information I need is inside this element
->```
+>```html
 ><aside class="portable-infobox noexcerpt pi-background pi-theme-structure pi-layout-default"><h2 class="pi-item pi-item-spacing pi-title" data-source="Box title">Crock Pot</h2><figure class="pi-item pi-media pi-image" data-source="image">
 >```
 >
 >GameItem.Name is the text content of the `<h2>` element with attribute "data-source"="box title". In the above example it is "Crock Pot"
 
 ### ChatGPT
-
 
 >Certainly! To achieve this, you can use AngleSharp to parse the HTML and extract the information you need. Here's an example of how you can implement the ParseGameItem method:
 >
@@ -101,12 +100,13 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >    }
 >}
 >```
->This example extracts the Name property from the provided HTML. You can extend this method to include logic for extracting other properties such as ImgUrl, Ingredients, and Prerequisite based on the structure of the HTML.
->
+>This example extracts the Name property from the provided HTML. You can extend this method to include logic for extracting other properties such as ImgUrl, Ingredients, and Prerequisite based on the structure of the HTML.  
+>Remember to handle the possible cases where the required elements might not be present on the page or have a different structure. This example provides a basic starting point, and you can build upon it based on the specific structure of the wiki pages you are working with.
+ChatGPT can make mistakes. Consider checking important information.
 
 ### Dev
 >Inside the same HTML block, you enhance ParseGameItem to get the GameItem.ImgUrl from the hyperlink in this sub-element
->```
+>```html
 ><img src="/images/thumb/a/ad/Crock_Pot_Build.png/300px-Crock_Pot_Build.png" srcset="/images/thumb/a/ad/Crock_Pot_Build.png/300px-Crock_Pot_Build.png 1x, /images/a/ad/Crock_Pot_Build.png 2x" class="pi-image-thumbnail" alt="Crock Pot" width="270" height="287">
 >```
 
@@ -115,7 +115,6 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >Certainly! To extract the ImgUrl property from the provided HTML, you can enhance the ParseGameItem method as follows:
 >
 >```csharp
->
 >using System;
 >using System.Collections.Generic;
 >using System.Linq;
@@ -169,7 +168,7 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 ### Dev
 >I've updated the GameItem class 
 >
->```
+>```csharp
 >namespace DstPlanner.WikiScraper.Gpt3;
 >
 >public record GameItem
@@ -202,7 +201,7 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >```
 >
 >In the same HTML as earlier, this sub-element shows contains a code
->```
+>```html
 ><div class="pi-item pi-data pi-item-spacing pi-border-color" data-source="spawnCode">
 >		<h3 class="pi-data-label pi-secondary-font"><a href="/wiki/Console" title="Console">Code</a></h3>
 >	<div class="pi-data-value pi-font"><code>"cookpot"</code></div>
@@ -215,7 +214,6 @@ This showns the conversation with ChatGPT3, synchronised with the commits produc
 >Certainly! You can modify the ParseGameItem method to include logic for extracting the GameItemId property from the provided HTML. Here's the updated code:
 >
 >```csharp
->
 >using System;
 >using System.Collections.Generic;
 >using System.Linq;
