@@ -79,9 +79,10 @@ namespace DstPlanner.WikiScraper.Gpt3
                     // Get the URL from the href attribute
                     var ingredientUrl = ingredientLink.GetAttribute("href");
 
-                    // Get the quantity from the text content (e.g., "×3")
-                    var quantityText = ingredientLink.NextElementSibling?.TextContent;
-                    if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText.Trim('×'), out var quantity))
+                    // Get the text content immediately following the <a> element
+                    var quantityText = ingredientLink.NextSibling?.TextContent?.Trim('×');
+
+                    if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText, out var quantity))
                     {
                         ingredients.Add(ingredientUrl, quantity);
                     }
@@ -90,6 +91,8 @@ namespace DstPlanner.WikiScraper.Gpt3
 
             return ingredients;
         }
+
+
 
     }
 }

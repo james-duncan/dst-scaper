@@ -736,3 +736,89 @@ private Dictionary<string, int> ExtractIngredients(IElement containerElement)
 >```
 >
 >This version includes a loop to iterate over all <a> elements within the "pi-data-value" div, extracting both the URL and the quantity. Make sure the structure of your HTML matches this assumption. Try using this updated version and see if it resolves the issue.
+
+### Dev
+>
+>Now its not returning any ingredients again
+>
+### ChatGPT
+>
+>I apologize for the confusion. Let's try to refine the code to better match the specific structure of your HTML. If the ingredients are directly within the <div class="pi-data-value"> and there's no nesting or other elements between the <a> tags, the following modification should work:
+>
+>```csharp
+>
+>private Dictionary<string, int> ExtractIngredients(IElement containerElement)
+>{
+>    var ingredients = new Dictionary<string, int>();
+>
+>    // Find the <div> element with class "pi-data-value" within the container element
+>    var ingredientsDivElement = containerElement.QuerySelector("div.pi-data-value");
+>
+>    if (ingredientsDivElement != null)
+>    {
+>        // Find all <a> elements within the <div> element
+>        var ingredientLinks = ingredientsDivElement.QuerySelectorAll("a");
+>
+>        foreach (var ingredientLink in ingredientLinks)
+>        {
+>            // Get the URL from the href attribute
+>            var ingredientUrl = ingredientLink.GetAttribute("href");
+>
+>            // Get the quantity from the text content (e.g., "×3")
+>            var quantityText = ingredientLink.TextContent.Trim('×');
+>            if (int.TryParse(quantityText, out var quantity))
+>            {
+>                ingredients.Add(ingredientUrl, quantity);
+>            }
+>        }
+>    }
+>
+>    return ingredients;
+>}
+>```
+>
+>This version assumes that each <a> element within the "pi-data-value" div contains both the URL and the quantity information. If there are still issues, you may want to inspect the HTML structure and adjust the code accordingly. If possible, provide a snippet of the HTML around the "pi-data-value" div for further assistance.
+>
+>
+### Dev
+>
+>You've made a mistake. The quantity is text, not in an element, immediately following the <a>
+>
+### ChatGPT
+>
+>I appreciate your clarification. If the quantity is directly in the text following the <a> element, you can modify the code accordingly. Here's an updated version:
+>
+>```csharp
+>
+>private Dictionary<string, int> ExtractIngredients(IElement containerElement)
+>{
+>    var ingredients = new Dictionary<string, int>();
+>
+>    // Find the <div> element with class "pi-data-value" within the container element
+>    var ingredientsDivElement = containerElement.QuerySelector("div.pi-data-value");
+>
+>    if (ingredientsDivElement != null)
+>    {
+>        // Find all <a> elements within the <div> element
+>        var ingredientLinks = ingredientsDivElement.QuerySelectorAll("a");
+>
+>        foreach (var ingredientLink in ingredientLinks)
+>        {
+>            // Get the URL from the href attribute
+>            var ingredientUrl = ingredientLink.GetAttribute("href");
+>
+>            // Get the text content immediately following the <a> element
+>            var quantityText = ingredientLink.NextSibling?.TextContent?.Trim('×');
+>
+>            if (!string.IsNullOrEmpty(quantityText) && int.TryParse(quantityText, out var quantity))
+>            {
+>                ingredients.Add(ingredientUrl, quantity);
+>            }
+>        }
+>    }
+>
+>    return ingredients;
+>}
+>```
+>
+>This modification uses NextSibling to get the text content immediately following the <a> element. If this still doesn't work as expected, please provide a snippet of the HTML around the "pi-data-value" div for further assistance.
